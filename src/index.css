@@ -1,0 +1,137 @@
+/* Reusable utility classes */
+
+@import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.centered-flex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+
+  /* Example: custom component class using @apply */
+  @layer components {
+    .centered-flex {
+      @apply flex flex-col items-center justify-center;
+    }
+    .card {
+      @apply bg-white rounded-2xl shadow-sm p-8 max-w-md w-full;
+    }
+    .input {
+      @apply w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 mb-5 text-base text-gray-900 outline-none transition focus:border-blue-500;
+    }
+    .btn-primary {
+      @apply w-full py-3 bg-gradient-to-r from-blue-600 to-blue-400 text-white border-none rounded-xl text-lg font-semibold cursor-pointer transition mt-2 hover:from-blue-700 hover:to-blue-500;
+    }
+    .input-label {
+      @apply font-semibold text-gray-900 mb-1 block text-base;
+    }
+    .input-icon {
+      @apply absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg;
+    }
+    .input-wrapper {
+      @apply relative w-full;
+    }
+  }
+  .input {
+    font-size: 1.15rem;
+    padding: 1rem 1.3rem;
+  }
+}
+@media (min-width: 1536px) {
+  .input {
+    font-size: 1.18rem;
+    padding: 1.1rem 1.4rem;
+  }
+}
+.input:focus {
+  border-color: var(--color-primary);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 0.8rem 0;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
+  color: #fff;
+  border: none;
+  border-radius: 1rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    font-size 0.2s,
+    padding 0.2s;
+  margin-top: 0.5rem;
+}
+@media (min-width: 640px) {
+  .btn-primary {
+    font-size: 1.1rem;
+    padding: 0.85rem 0;
+  }
+}
+@media (min-width: 768px) {
+  .btn-primary {
+    font-size: 1.15rem;
+    padding: 0.95rem 0;
+  }
+}
+@media (min-width: 1280px) {
+  .btn-primary {
+    font-size: 1.18rem;
+    padding: 1.05rem 0;
+  }
+}
+@media (min-width: 1536px) {
+  .btn-primary {
+    font-size: 1.22rem;
+    padding: 1.15rem 0;
+  }
+}
+.btn-primary:hover {
+  background: linear-gradient(
+    90deg,
+    var(--color-primary-dark) 0%,
+    var(--color-accent) 100%
+  );
+}
+
+.input-label {
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0.18rem;
+  display: block;
+  font-size: 0.98rem;
+  transition: font-size 0.2s;
+}
+@media (min-width: 640px) {
+  .input-label {
+    font-size: 1.05rem;
+  }
+}
+@media (min-width: 1280px) {
+  .input-label {
+    font-size: 1.12rem;
+  }
+}
+
+.input-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-muted);
+  font-size: 1.1rem;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
