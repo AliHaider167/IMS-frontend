@@ -1,51 +1,62 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PurchaserHeader from "./components/PurchaserHeader";
 import PurchaserStatCard from "./components/PurchaserStatCard";
 import ProductCard from "./components/ProductCard";
 import AddProductModal from "./components/AddProductModal";
-
-const stats = [
-	{ title: "Total Products", value: 6, subtitle: "" },
-	{ title: "Total Stock", value: 193, subtitle: "Units" },
-	{ title: "Inventory Value", value: "$10585.00", subtitle: "Buying cost" },
-];
-
-const products = [
-	{
-		name: "Nike Air Max 270",
-		category: "Running Shoes",
-		description: "Lightweight running shoes with Air Max cushioning",
-		barcode: "1234567890123",
-		buyingPrice: 85,
-		sellingPrice: 140,
-		stock: 25,
-		image: "https://images.unsplash.com/photo-1517260911205-8c1e1a0b6b8c?auto=format&fit=crop&w=600&q=80"
-	},
-	{
-		name: "Adidas Ultraboost 22",
-		category: "Running Shoes",
-		description: "Premium running shoes with Boost technology",
-		barcode: "2345678901234",
-		buyingPrice: 95,
-		sellingPrice: 160,
-		stock: 18,
-		image: "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=600&q=80"
-	},
-	{
-		name: "Converse Chuck Taylor",
-		category: "Casual Shoes",
-		description: "Classic canvas high-top sneakers",
-		barcode: "3456789012345",
-		buyingPrice: 35,
-		sellingPrice: 65,
-		stock: 40,
-		image: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80"
-	}
-];
-
-export default function PurchaserDashboard() {
+import EditProductModal from "./components/EditProductModal";
+import { getPurchaserProducts } from "../../services/api";
+ 
+ export default function PurchaserDashboard() {
 	const [showAddModal, setShowAddModal] = useState(false);
+	const [products, setProducts] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [stats, setStats] = useState([
+		{ title: "Total Products", value: 0, subtitle: "" },
+		{ title: "Total Stock", value: 0, subtitle: "Units" },
+		{ title: "Inventory Value", value: "$0.00", subtitle: "Buying cost" },
+	]);
+	const [showEditModal, setShowEditModal] = useState(false);
+	const [editProduct, setEditProduct] = useState(null);
+
+	useEffect(() => {
+		setLoading(true);
+		getPurchaserProducts()
+			.then((res) => {
+				setProducts(res.data.products);
+				// Update stats
+				setStats([
+					{ title: "Total Products", value: res.data.products.length, subtitle: "" },
+					{ title: "Total Stock", value: res.data.products.reduce((sum, p) => sum + p.stock, 0), subtitle: "Units" },
+					{ title: "Inventory Value", value: "$" + res.data.products.reduce((sum, p) => sum + p.buyingPrice * p.stock, 0).toFixed(2), subtitle: "Buying cost" },
+				]);
+				setLoading(false);
+			})
+			.catch(() => setLoading(false));
+	}, []);
+
+	const handleEdit = (product) => {
+		setEditProduct(product);
+		setShowEditModal(true);
+	};
+
+	const handleEditSave = () => {
+		setShowEditModal(false);
+		setEditProduct(null);
+		// Refresh product list
+		setLoading(true);
+		getPurchaserProducts()
+			.then((res) => {
+				setProducts(res.data.products);
+				setStats([
+					{ title: "Total Products", value: res.data.products.length, subtitle: "" },
+					{ title: "Total Stock", value: res.data.products.reduce((sum, p) => sum + p.stock, 0), subtitle: "Units" },
+					{ title: "Inventory Value", value: "$" + res.data.products.reduce((sum, p) => sum + p.buyingPrice * p.stock, 0).toFixed(2), subtitle: "Buying cost" },
+				]);
+				setLoading(false);
+			})
+			.catch(() => setLoading(false));
+	};
 
 	return (
 		<div className="min-h-screen bg-[#f4f8ff]">
@@ -72,12 +83,13 @@ export default function PurchaserDashboard() {
 					</div>
 					<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 						{products.map((product, idx) => (
-							<ProductCard key={idx} product={product} />
+							<ProductCard key={idx} product={product} onEdit={handleEdit} />
 						))}
 					</div>
 				</div>
 			</main>
 			<AddProductModal open={showAddModal} onClose={() => setShowAddModal(false)} />
+			<EditProductModal open={showEditModal} onClose={() => setShowEditModal(false)} product={editProduct} onSave={handleEditSave} />
 		</div>
 	);
-}
+ }

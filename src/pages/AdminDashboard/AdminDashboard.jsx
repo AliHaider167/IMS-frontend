@@ -3,6 +3,7 @@ import Header from "../../components/Header";
 import StatCard from "./components/StatCard";
 import TabNav from "./components/TabNav";
 import UserCard from "./components/UserCard";
+import AddEmployeeForm from "./components/AddEmployeeForm";
 import ActivityCard from "./components/ActivityCard";
 import SalesReportCard from "./components/SalesReportCard";
 
@@ -167,7 +168,10 @@ export default function AdminDashboard() {
                   <h2 className="text-2xl font-bold text-gray-900">
                     User Management
                   </h2>
-                  <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-semibold transition">
+                  <button
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-semibold transition"
+                    onClick={() => setShowAddUser(true)}
+                  >
                     <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
                       <rect
                         x="3"
@@ -189,6 +193,9 @@ export default function AdminDashboard() {
                     Add User
                   </button>
                 </div>
+                {showAddUser && (
+                  <AddEmployeeForm onSuccess={() => setShowAddUser(false)} />
+                )}
                 <UserCard name="admin" role="Super Admin" status="Active" />
               </div>
             )}

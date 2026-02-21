@@ -1,21 +1,12 @@
 import React, { useState } from "react";
-import { addProduct } from "../../../services/api";
+import { updateProduct } from "../../../services/api";
 
-export default function AddProductModal({ open, onClose }) {
-  const [form, setForm] = useState({
-    name: "",
-    category: "",
-    description: "",
-    barcode: "",
-    buyingPrice: "",
-    sellingPrice: "",
-    stock: "",
-    image: "",
-  });
+export default function EditProductModal({ open, onClose, product, onSave }) {
+  const [form, setForm] = useState(product || {});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (!open) return null;
+  if (!open || !product) return null;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -26,12 +17,13 @@ export default function AddProductModal({ open, onClose }) {
     setLoading(true);
     setError("");
     try {
-      await addProduct({ ...form });
+      await updateProduct(form._id, form);
       setLoading(false);
+      onSave && onSave();
       onClose();
     } catch (err) {
       setLoading(false);
-      setError(err.response?.data?.message || "Failed to add product");
+      setError(err.response?.data?.message || "Failed to update product");
     }
   };
 
@@ -51,7 +43,7 @@ export default function AddProductModal({ open, onClose }) {
             />
           </svg>
         </button>
-        <h2 className="text-2xl font-bold mb-6">Add New Product</h2>
+        <h2 className="text-2xl font-bold mb-6">Edit Product</h2>
         {error && <div className="text-red-600 mb-4">{error}</div>}
         <form
           className="grid grid-cols-1 md:grid-cols-2 gap-4"
@@ -62,9 +54,8 @@ export default function AddProductModal({ open, onClose }) {
             <input
               className="input"
               name="name"
-              value={form.name}
+              value={form.name || ""}
               onChange={handleChange}
-              placeholder="Enter product name"
               required
             />
           </div>
@@ -73,9 +64,8 @@ export default function AddProductModal({ open, onClose }) {
             <input
               className="input"
               name="category"
-              value={form.category}
+              value={form.category || ""}
               onChange={handleChange}
-              placeholder="e.g., Electronics"
             />
           </div>
           <div className="col-span-2 flex flex-col gap-2">
@@ -83,50 +73,28 @@ export default function AddProductModal({ open, onClose }) {
             <textarea
               className="input"
               name="description"
-              value={form.description}
+              value={form.description || ""}
               onChange={handleChange}
-              placeholder="Enter product description"
               rows={2}
             />
           </div>
           <div className="col-span-2 flex flex-col gap-2">
             <label className="font-semibold">Barcode *</label>
-            <div className="flex items-center gap-2">
-              <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-                <rect
-                  x="3"
-                  y="7"
-                  width="18"
-                  height="10"
-                  rx="2"
-                  stroke="#888"
-                  strokeWidth="1.5"
-                />
-                <path
-                  d="M7 7V5a5 5 0 0 1 10 0v2"
-                  stroke="#888"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <input
-                className="input flex-1"
-                name="barcode"
-                value={form.barcode}
-                onChange={handleChange}
-                placeholder="Enter barcode number"
-                required
-              />
-            </div>
+            <input
+              className="input"
+              name="barcode"
+              value={form.barcode || ""}
+              onChange={handleChange}
+              required
+            />
           </div>
           <div className="flex flex-col gap-2">
             <label className="font-semibold">Buying Price *</label>
             <input
               className="input"
               name="buyingPrice"
-              value={form.buyingPrice}
+              value={form.buyingPrice || ""}
               onChange={handleChange}
-              placeholder="0.00"
               type="number"
               required
             />
@@ -136,9 +104,8 @@ export default function AddProductModal({ open, onClose }) {
             <input
               className="input"
               name="sellingPrice"
-              value={form.sellingPrice}
+              value={form.sellingPrice || ""}
               onChange={handleChange}
-              placeholder="0.00"
               type="number"
               required
             />
@@ -148,41 +115,20 @@ export default function AddProductModal({ open, onClose }) {
             <input
               className="input"
               name="stock"
-              value={form.stock}
+              value={form.stock || ""}
               onChange={handleChange}
-              placeholder="0"
               type="number"
               required
             />
           </div>
           <div className="col-span-2 flex flex-col gap-2">
             <label className="font-semibold">Image URL</label>
-            <div className="flex items-center gap-2">
-              <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-                <rect
-                  x="3"
-                  y="5"
-                  width="18"
-                  height="14"
-                  rx="2"
-                  stroke="#888"
-                  strokeWidth="1.5"
-                />
-                <path
-                  d="M8 13l2.5 2.5L16 10"
-                  stroke="#888"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <input
-                className="input flex-1"
-                name="image"
-                value={form.image}
-                onChange={handleChange}
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
+            <input
+              className="input flex-1"
+              name="image"
+              value={form.image || ""}
+              onChange={handleChange}
+            />
           </div>
           <div className="col-span-2 mt-4">
             <button
@@ -190,7 +136,7 @@ export default function AddProductModal({ open, onClose }) {
               className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-500 hover:from-blue-700 hover:to-purple-600 transition text-lg"
               disabled={loading}
             >
-              {loading ? "Adding..." : "Add Product"}
+              {loading ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>

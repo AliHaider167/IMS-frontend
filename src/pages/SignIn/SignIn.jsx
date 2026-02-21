@@ -1,14 +1,36 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { login } from "../../services/api";
 import "../../index.css";
 import "../../App.css";
 
 export default function SignIn() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle sign in logic here
+    setError("");
+    setLoading(true);
+    try {
+      const res = await login({ username, password });
+      setLoading(false);
+      // Store token and user info
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      // Redirect based on role
+      const role = res.data.user.role;
+      if (role === "admin") navigate("/admin");
+      else if (role === "seller") navigate("/seller");
+      else if (role === "purchaser") navigate("/purchaser");
+      else navigate("/");
+    } catch (err) {
+      setLoading(false);
+      setError(err.response?.data?.message || "Login failed");
+    }
   };
 
   return (
